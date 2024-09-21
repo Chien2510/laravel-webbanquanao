@@ -165,10 +165,7 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
     public function getProfit()
     {
         return DB::select('
-            select sum(order_details.quantity * order_details.unit_price) - sum(order_details.quantity * products.price_import) as profit from products
-            join products_color on products.id = products_color.product_id
-            join products_size on products_color.id = products_size.product_color_id
-            join order_details on products_size.id = order_details.product_size_id
+            select sum(order_details.quantity * order_details.unit_price) - sum(order_details.quantity * order_details.import_price) as profit from order_details
             join orders on orders.id = order_details.order_id
             where orders.order_status = 3;
         ')[0]->profit ?? 0;
@@ -250,21 +247,19 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
     {
         return DB::table('orders as o')
             ->join('order_details as od', 'o.id', '=', 'od.order_id')
-            ->join('products_size as pz', 'pz.id', '=', 'od.product_size_id')
-            ->join('products_color as pc', 'pc.id', '=', 'pz.product_color_id')
-            ->join('products as p', 'p.id', '=', 'pc.product_id')
             ->join('payments as pm', 'pm.id', '=', 'o.payment_id')
             ->select(
                 'o.id',
                 'pm.name',
                 'o.created_at',
                 'o.transport_fee',
-                DB::raw('SUM(od.quantity * od.unit_price) as revenue'),
-                DB::raw('SUM((od.quantity * od.unit_price) - (od.quantity * p.price_import)) as profit')
+                DB::raw('o.total_money as revenue'),
+                DB::raw('SUM(od.quantity * od.import_price) as total_import'),
+                DB::raw('SUM((od.quantity * od.unit_price) - (od.quantity * od.import_price)) as profit')
             )
             ->where('o.order_status', 3)
             ->whereBetween(DB::raw('DATE(o.created_at)'), [$start, $end])
-            ->groupBy('o.id','pm.name','o.created_at','o.transport_fee')
+            ->groupBy('o.id','pm.name','o.created_at','o.transport_fee', 'total_money')
             ->get();
     }
 

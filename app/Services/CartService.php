@@ -65,6 +65,9 @@ class CartService
                 'image' => $product->product_img,
                 'size' => $product->size_name,
                 'color' => $product->color_name,
+                'import_price' => $product->price_import,
+                'updated_at' => $product->updated_at,
+                'product_id' => $product->product_id
             )
         ]);
 

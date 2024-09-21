@@ -25,7 +25,7 @@
                     </div>
                 </div>
 
-                <div class="col-xxl-4 col-md-4">
+                <div class="col-xxl-3 col-md-6 col-sm-6">
                     <div class="card info-card revenue-card">
                         <div class="card-body">
                             <h5 class="card-title">Tổng Doanh Thu</h5>
@@ -38,7 +38,20 @@
                     </div>
                 </div>
 
-                <div class="col-xxl-4 col-md-4">
+                <div class="col-xxl-3 col-md-6 col-sm-6">
+                    <div class="card info-card revenue-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Tổng Chi Phí Nhập Hàng </h5>
+                            <div class="d-flex align-items-center">
+                                <div class="ps-3">
+                                    <h6>{{ format_number_to_money($total_import) }} VND</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-3 col-md-6 col-sm-6">
                     <div class="card info-card revenue-card">
                         <div class="card-body">
                             <h5 class="card-title">Tổng Lợi Nhuận</h5>
@@ -51,7 +64,7 @@
                     </div>
                 </div>
 
-                <div class="col-xxl-4 col-md-4">
+                <div class="col-xxl-3 col-md-6 col-sm-6">
                     <div class="card info-card revenue-card">
                         <div class="card-body">
                             <h5 class="card-title">Tổng Chi Phí Vận Chuyển </h5>

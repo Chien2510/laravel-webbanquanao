@@ -200,11 +200,13 @@ class DashboardService
         $revenue = 0;
         $profit = 0;
         $fee = 0;
+        $totalImport = 0;
 
         foreach ($statisticalRevenueAndProfit as $item) {
             $revenue += $item->revenue;
             $profit += $item->profit;
             $fee += $item->transport_fee;
+            $totalImport += $item->total_import;
         }
         $tableStatisRevAndPro = [
             'headers' => [
@@ -219,6 +221,11 @@ class DashboardService
                 [
                     'text' => 'Tổng Tiền',
                     'key' => 'revenue',
+                    'format' => true,
+                ],
+                [
+                    'text' => 'Tổng Tiền Nhập Hàng',
+                    'key' => 'total_import',
                     'format' => true,
                 ],
                 [
@@ -256,6 +263,7 @@ class DashboardService
             'revenue' => $revenue,
             'profit' => $profit,
             'fee' => $fee,
+            'total_import' =>$totalImport,
             'title' => "Thống Kê Chi Tiết",
         ];
     }

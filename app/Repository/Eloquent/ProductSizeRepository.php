@@ -34,7 +34,10 @@ class ProductSizeRepository extends BaseRepository
             'colors.name as color_name',
             'sizes.name as size_name',
             'products.price_sell as product_price_sell',
-            'products_size.quantity as products_size_quantity'
+            'products_size.quantity as products_size_quantity',
+            'products.price_import as price_import',
+            'products.updated_at as updated_at',
+            'products.id as product_id'
         )
         ->where('products_size.id', $id)->first();
     }

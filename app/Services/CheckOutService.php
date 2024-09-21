@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Requests\CheckOutRequest;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Models\Product;
 use App\Models\ProductSize;
 use App\Repository\Eloquent\OrderDetailRepository;
 use App\Repository\Eloquent\OrderRepository;
@@ -93,6 +94,9 @@ class CheckOutService
     public function store(CheckOutRequest $request)
     {
         try {
+            if ($this->checkProductUpdateAfterAddCard()) {
+                return redirect()->route('cart.index')->with('error', 'Sản phẩm bạn mua đã được thay đổi thông tin');
+            }
             // lấy phí vận chuyển
             $fee = $this->getTransportFee()."";
             //tạo dữ liệu đơn hàng
@@ -117,6 +121,7 @@ class CheckOutService
                     'product_size_id' => $product->id,
                     'unit_price' => $product->price,
                     'quantity' => $product->quantity,
+                    'import_price' => $product->attributes->import_price
                 ];
                 $this->orderDetailRepository->create($orderDetail);
             }
@@ -150,6 +155,9 @@ class CheckOutService
 
     public function paymentMomo()
     {
+        if ($this->checkProductUpdateAfterAddCard()) {
+            return redirect()->route('cart.index')->with('error', 'Sản phẩm bạn mua đã được thay đổi thông tin');
+        }
         $orderId = time() . mt_rand(111, 999)."";
         $amount = \Cart::getTotal() + $this->getTransportFee()."";
         $returnUrl = route('checkout.callback_momo');
@@ -159,6 +167,9 @@ class CheckOutService
 
     public function paymentVNPAY()
     {
+        if ($this->checkProductUpdateAfterAddCard()) {
+            return redirect()->route('cart.index')->with('error', 'Sản phẩm bạn mua đã được thay đổi thông tin');
+        }
         $orderId = time() . mt_rand(111, 999)."";
         $amount = \Cart::getTotal() + $this->getTransportFee()."";
         $returnUrl = route('checkout.callback_momo');
@@ -400,6 +411,23 @@ class CheckOutService
         $jsonResult = json_decode($result->body(), true);
         // chuyển hướng người dùng sang trang thanh toán của momo
         return redirect($jsonResult['payUrl']);
+    }
+
+    private function checkProductUpdateAfterAddCard() 
+    {
+        $ids = [];
+        foreach(\Cart::getContent() as $product){
+            $productNew = Product::find($product->attributes->product_id);
+            if ($productNew->updated_at != $product->attributes->updated_at) {
+                $ids[] = $product->id;
+            }
+        }
+
+        foreach ($ids as $id) {
+            \Cart::remove($id);
+        }
+
+        return count($ids) > 0;
     }
     // public function payWithMoMo($orderId, $amount, $returnUrl, $notifyurl)
     // {
