@@ -34,7 +34,7 @@
                       <td>{{ $infomation_user['name'] }}</td>
                       <td>{{ $infomation_user['phone_number'] }}</td>
                       <td>{{ $infomation_user['email'] }}</td>
-                      <td>{{ $infomation_user['apartment_number'] . ', ' . $infomation_user['ward'] . ', ' . $infomation_user['district'] . ', ' . $infomation_user['city'] }}</td>
+                      <td>{{ $infomation_user['address']}}</td>
                     </tr>
                   </tbody>
                 </table>

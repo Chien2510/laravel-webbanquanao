@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
+
 
 class CheckOutService
 {
@@ -93,12 +95,12 @@ class CheckOutService
 
     public function store(CheckOutRequest $request)
     {
-        try {
+        // try {
             if ($this->checkProductUpdateAfterAddCard()) {
                 return redirect()->route('cart.index')->with('error', 'Sản phẩm bạn mua đã được thay đổi thông tin');
             }
             // lấy phí vận chuyển
-            $fee = $this->getTransportFee()."";
+            $fee = $this->getTransportFee($request->district, $request->ward)."";
             //tạo dữ liệu đơn hàng
             $dataOrder = [
                 'id' => time() . mt_rand(111, 999),
@@ -108,6 +110,10 @@ class CheckOutService
                 'order_status' => Order::STATUS_ORDER['wait'],
                 'transport_fee' => $fee,
                 'note' => null,
+                'name' => Session::get('info_order.name'),
+                'email' => Session::get('info_order.email'),
+                'phone' => Session::get('info_order.phone'),
+                'address' => Session::get('info_order.address'),
             ];
             DB::beginTransaction();
             // thêm đơn hàng vào csdl
@@ -131,63 +137,62 @@ class CheckOutService
 
             //chuyển hướng người dùng đến trang lịch sử mua hàng
             return redirect()->route('order_history.index');
-        } catch (Exception $e) {
-            Log::error($e);
-            DB::rollBack();
-            // check quantity product
-            foreach(\Cart::getContent() as $product){
-                $productSize = ProductSize::where('id', $product->id)->first();
-                if($productSize->quantity < $product->quantity) {
-                    \Cart::update(
-                        $product->id,
-                        [
-                            'quantity' => [
-                                'relative' => false,
-                                'value' => $productSize->quantity
-                            ],
-                        ]
-                    );
-                }
-            }
-            return redirect()->route('cart.index')->with('error', 'Có lỗi xảy ra vui lòng kiểm tra lại');
-        }
+        // } catch (Exception $e) {
+        //     Log::error($e);
+        //     DB::rollBack();
+        //     // check quantity product
+        //     foreach(\Cart::getContent() as $product){
+        //         $productSize = ProductSize::where('id', $product->id)->first();
+        //         if($productSize->quantity < $product->quantity) {
+        //             \Cart::update(
+        //                 $product->id,
+        //                 [
+        //                     'quantity' => [
+        //                         'relative' => false,
+        //                         'value' => $productSize->quantity
+        //                     ],
+        //                 ]
+        //             );
+        //         }
+        //     }
+        //     return redirect()->route('cart.index')->with('error', 'Có lỗi xảy ra vui lòng kiểm tra lại');
+        // }
     }
 
-    public function paymentMomo()
+    public function paymentMomo(CheckOutRequest $request)
     {
         if ($this->checkProductUpdateAfterAddCard()) {
             return redirect()->route('cart.index')->with('error', 'Sản phẩm bạn mua đã được thay đổi thông tin');
         }
         $orderId = time() . mt_rand(111, 999)."";
-        $amount = \Cart::getTotal() + $this->getTransportFee()."";
+        $amount = \Cart::getTotal() + $this->getTransportFee($request->district, $request->ward)."";
         $returnUrl = route('checkout.callback_momo');
         $notifyUrl = route('checkout.callback_momo');
         return $this->payWithMoMo($orderId, $amount, $returnUrl, $notifyUrl);
     }
 
-    public function paymentVNPAY()
+    public function paymentVNPAY(CheckOutRequest $request)
     {
         if ($this->checkProductUpdateAfterAddCard()) {
             return redirect()->route('cart.index')->with('error', 'Sản phẩm bạn mua đã được thay đổi thông tin');
         }
         $orderId = time() . mt_rand(111, 999)."";
-        $amount = \Cart::getTotal() + $this->getTransportFee()."";
+        $amount = \Cart::getTotal() + $this->getTransportFee($request->district, $request->ward)."";
         $returnUrl = route('checkout.callback_momo');
         return $this->handlePaymentWithVNPAY($returnUrl, $amount, $orderId);
     }
 
-    public function getTransportFee()
+    public function getTransportFee($district, $ward)
     {
         //get service id
         $fromDistrict = "1493";
         $shopId = "3577591";
-        $toDistrict = Auth::user()->address->district;
         $response = Http::withHeaders([
             'token' => '24d5b95c-7cde-11ed-be76-3233f989b8f3'
         ])->get('https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services', [
             "shop_id" => $shopId,
             "from_district" => $fromDistrict,
-            "to_district" => $toDistrict,
+            "to_district" => $district,
         ]);
         $serviceId = $response['data'][0]['service_id'];
 
@@ -197,8 +202,8 @@ class CheckOutService
             "insurance_value" => 500000,
             "coupon" => null,
             "from_district_id" => $fromDistrict,
-            "to_district_id" => Auth::user()->address->district,
-            "to_ward_code" => Auth::user()->address->ward,
+            "to_district_id" => $district,
+            "to_ward_code" => $ward,
             "height" => 15,
             "length" => 15,
             "weight" => 1000,

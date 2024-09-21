@@ -6,6 +6,7 @@ use App\Http\Requests\CheckOutRequest;
 use App\Models\Payment;
 use App\Services\CheckOutService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class CheckOutController extends Controller
 {
@@ -44,15 +45,23 @@ class CheckOutController extends Controller
     // xử lý khi người dùng bấm nút thanh toán đơn hàng
     public function store(CheckOutRequest $request)
     {
+        if (Session::has('info_order')) {
+            Session::forget('info_order');
+        }
+        Session::put('info_order', [
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone_number,
+            'address' => $request->address,
+        ]);
         // nếu khách hàng chọn thanh toán online momo
         if ($request->payment_method == Payment::METHOD['momo']) {
-            return $this->checkOutService->paymentMomo();
+            return $this->checkOutService->paymentMomo($request);
         }
         // nếu khách hàng chọn thanh toán online vnpay
         if ($request->payment_method == Payment::METHOD['vnpay']) {
-            return $this->checkOutService->paymentVNPAY();
+            return $this->checkOutService->paymentVNPAY($request);
         }
-
         return $this->checkOutService->store($request);
     }
 

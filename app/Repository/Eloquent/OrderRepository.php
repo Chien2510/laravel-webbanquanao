@@ -104,17 +104,13 @@ class OrderRepository extends BaseRepository implements OrderRepositoryInterface
     {
         return DB::table('orders')
         ->join('users', 'orders.user_id', '=', 'users.id')
-        ->join('addresses', 'users.id', '=', 'addresses.user_id')
         ->join('payments', 'orders.payment_id', '=', 'payments.id')
         ->select(
             'users.id as user_id',
-            'users.name as user_name',
-            'users.email as user_email',
-            'users.phone_number as user_phone_number',
-            'addresses.city as address_city',
-            'addresses.district as address_district',
-            'addresses.ward as address_ward',
-            'addresses.apartment_number as address_apartment_number',
+            'orders.name as user_name',
+            'orders.email as user_email',
+            'orders.phone as user_phone_number',
+            'orders.address as user_address',
             'payments.name as payment_name',
             'orders.transport_fee as orders_transport_fee',
         )

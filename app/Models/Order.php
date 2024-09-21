@@ -33,6 +33,10 @@ class Order extends Model
         'transport_fee',
         'note',
         'payment_status',
+        'address',
+        'phone',
+        'email',
+        'name'
     ];
 
     const STATUS_ORDER = [
