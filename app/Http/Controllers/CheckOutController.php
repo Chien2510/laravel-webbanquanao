@@ -53,6 +53,8 @@ class CheckOutController extends Controller
             'email' => $request->email,
             'phone' => $request->phone_number,
             'address' => $request->address,
+            'district' => $request->district,
+            'ward' => $request->ward,
         ]);
         // nếu khách hàng chọn thanh toán online momo
         if ($request->payment_method == Payment::METHOD['momo']) {

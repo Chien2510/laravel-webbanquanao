@@ -99,7 +99,25 @@ Route::middleware(['maintenance'])->group(function () {
         Route::post('account/change-new-password', [ForgotPasswordController::class, "updatePassword"]);
     
     });
+
+    
 });
+use App\Http\Controllers\ChatGPT5RealController;
+Route::post('/chat-gpt5', [ChatGPT5RealController::class, 'ask'])->name('chat.gpt5');
 
 
 
+use App\Http\Controllers\Admin\Auth\AdminAuthController;
+use App\Http\Controllers\Admin\DashboardController;
+
+// ADMIN AUTH
+Route::prefix('admin')->group(function () {
+    Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login.form');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('admin.login');
+    Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+
+    // Dashboard (sau khi đăng nhập)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+});
+use App\Http\Controllers\Admin\AIAnalyzeController;
+Route::post('/admin/analyze-ai', [AIAnalyzeController::class, 'analyze'])->name('admin.analyze.ai');

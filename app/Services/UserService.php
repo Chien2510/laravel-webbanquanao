@@ -178,7 +178,6 @@ class UserService
                     'attribute' => 'phone_number',
                     'label' => 'Số Điện Thoại',
                     'type' => 'text',
-                    'format_phone' => true,
                 ],
                 [
                     'attribute' => 'city',
@@ -310,6 +309,7 @@ class UserService
                 'phone_number' => $data['phone_number'],
                 'role_id' => Role::ROLE['user'],
                 'created_by' => Auth::guard('admin')->user()->id,
+                'email_verified_at' => Carbon::now(),
             ];
             
             // address data request
@@ -331,7 +331,6 @@ class UserService
                     'expires_at' => Carbon::now()->addMinutes($time),
                 ]
             );
-            $user->notify(new VerifyUser($token));
             $addressData['user_id'] = $user->id;
             $this->addressRepository->updateOrCreate($addressData);
             DB::commit();
@@ -561,25 +560,7 @@ class UserService
             }
 
             DB::beginTransaction();
-            if ($userData['email'] !== $user->email) {
-                unset($userData['email']);
-                $this->userRepository->update($user, $userData);
-                $token = Str::random(64);
-                $time = Config::get('auth.verification.expire.resend', 60);
-                UserVerify::updateOrCreate(
-                    ['user_id' => $user->id],
-                    [
-                        'token' => $token,
-                        'expires_at' => Carbon::now()->addMinutes($time),
-                        'email_verify' => $request->email,
-                    ]
-                );
-                $user['email'] = $request->email;
-                $user->notify(new VerifyUser($token));
-            } else {
-                $this->userRepository->update($user, $userData);
-            }
-            
+            $this->userRepository->update($user, $userData);
             DB::commit();
             return redirect()->route('admin.users_index')->with('success', TextSystemConst::UPDATE_SUCCESS);
         } catch (Exception $e) {

@@ -48,9 +48,9 @@ class VerifyUser extends Notification
             . $notifiable->getKey()
             . '?token=' . $this->token;
         return (new MailMessage)
-                    ->subject('[TRUONG THUY SHOP] XÁC NHẬN TÀI KHOẢN')
+                    ->subject('[WebBanQuanAo] XÁC NHẬN TÀI KHOẢN')
                     ->line('--------------------------------')
-                    ->line('Xin chào ' . $notifiable->name . ', chào mừng bạn đã đến với TRUONG THUY SHOP')
+                    ->line('Xin chào ' . $notifiable->name . ', chào mừng bạn đã đến với website bán quần áo')
                     ->line('--------------------------------')
                     ->line('Để xác nhận tài khoản vui lòng bấm vào nút xác nhận dưới đây')
                     ->action('Xác Nhận', $verifyUrl);

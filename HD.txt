@@ -1,0 +1,7 @@
+http://localhost/WebBanQuanAo_2025/public/index.php
+http://localhost/WebBanQuanAo_2025/public/admin/login
+tk admin@gmail.com
+mk password
+
+tk hoalong...
+mk Chien25102003@

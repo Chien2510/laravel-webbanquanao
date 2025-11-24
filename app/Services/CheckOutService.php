@@ -95,7 +95,7 @@ class CheckOutService
 
     public function store(CheckOutRequest $request)
     {
-        // try {
+        try {
             if ($this->checkProductUpdateAfterAddCard()) {
                 return redirect()->route('cart.index')->with('error', 'Sản phẩm bạn mua đã được thay đổi thông tin');
             }
@@ -137,26 +137,26 @@ class CheckOutService
 
             //chuyển hướng người dùng đến trang lịch sử mua hàng
             return redirect()->route('order_history.index');
-        // } catch (Exception $e) {
-        //     Log::error($e);
-        //     DB::rollBack();
-        //     // check quantity product
-        //     foreach(\Cart::getContent() as $product){
-        //         $productSize = ProductSize::where('id', $product->id)->first();
-        //         if($productSize->quantity < $product->quantity) {
-        //             \Cart::update(
-        //                 $product->id,
-        //                 [
-        //                     'quantity' => [
-        //                         'relative' => false,
-        //                         'value' => $productSize->quantity
-        //                     ],
-        //                 ]
-        //             );
-        //         }
-        //     }
-        //     return redirect()->route('cart.index')->with('error', 'Có lỗi xảy ra vui lòng kiểm tra lại');
-        // }
+        } catch (Exception $e) {
+            Log::error($e);
+            DB::rollBack();
+            // check quantity product
+            foreach(\Cart::getContent() as $product){
+                $productSize = ProductSize::where('id', $product->id)->first();
+                if($productSize->quantity < $product->quantity) {
+                    \Cart::update(
+                        $product->id,
+                        [
+                            'quantity' => [
+                                'relative' => false,
+                                'value' => $productSize->quantity
+                            ],
+                        ]
+                    );
+                }
+            }
+            return redirect()->route('cart.index')->with('error', 'Có lỗi xảy ra vui lòng kiểm tra lại');
+        }
     }
 
     public function paymentMomo(CheckOutRequest $request)
@@ -185,7 +185,7 @@ class CheckOutService
     public function getTransportFee($district, $ward)
     {
         //get service id
-        $fromDistrict = "1493";
+        $fromDistrict = "2027";
         $shopId = "3577591";
         $response = Http::withHeaders([
             'token' => '24d5b95c-7cde-11ed-be76-3233f989b8f3'
@@ -194,11 +194,11 @@ class CheckOutService
             "from_district" => $fromDistrict,
             "to_district" => $district,
         ]);
-        $serviceId = $response['data'][0]['service_id'];
+        $serviceId = $response['data'][0]['service_type_id'];
 
         //data get fee
         $dataGetFee = [
-            "service_id" => $serviceId,
+            "service_type_id" => $serviceId,
             "insurance_value" => 500000,
             "coupon" => null,
             "from_district_id" => $fromDistrict,
@@ -219,17 +219,23 @@ class CheckOutService
     // sau khi thanh toán thành công thì momo sẽ tự động chuyển đến hàm xử này
     public function callbackMomo(Request $request)
     {
-        try {
+        // try {
             if ($request->resultCode == 0 || $request->vnp_ResponseCode == 00) {
                 //data order
+                $district = Session::get('info_order.district');
+                $ward = Session::get('info_order.ward');
                 $dataOrder = [
                     'id' => $request->orderId ?? $request->vnp_TxnRef,
                     'payment_id' => (isset($request->vnp_TxnRef)) ? Payment::METHOD['vnpay'] : Payment::METHOD['momo'],
                     'user_id' => Auth::user()->id,
                     'total_money' => $request->amount ?? $request->vnp_Amount / 100,
                     'order_status' => Order::STATUS_ORDER['wait'],
-                    'transport_fee' => $this->getTransportFee(),
+                    'transport_fee' => $this->getTransportFee($district, $ward),
                     'note' => null,
+                    'name' => Session::get('info_order.name'),
+                    'email' => Session::get('info_order.email'),
+                    'phone' => Session::get('info_order.phone'),
+                    'address' => Session::get('info_order.address'),
                 ];
                 DB::beginTransaction();
                 // thêm 1 đơn hàng vào database
@@ -243,6 +249,7 @@ class CheckOutService
                         'product_size_id' => $product->id,
                         'unit_price' => $product->price,
                         'quantity' => $product->quantity,
+                        'import_price' => $product->attributes->import_price
                     ];
                     $this->orderDetailRepository->create($orderDetail);
                 }
@@ -255,26 +262,26 @@ class CheckOutService
             }
 
             return redirect()->route('checkout.index');
-        } catch (Exception $e) {
-            Log::error($e);
-            DB::rollBack();
-            // check quantity product
-            foreach(\Cart::getContent() as $product){
-                $productSize = ProductSize::where('id', $product->id)->first();
-                if($productSize->quantity < $product->quantity) {
-                    \Cart::update(
-                        $product->id,
-                        [
-                            'quantity' => [
-                                'relative' => false,
-                                'value' => $productSize->quantity
-                            ],
-                        ]
-                    );
-                }
-            }
-            return redirect()->route('cart.index')->with('error', 'Có lỗi xảy ra vui lòng kiểm tra lại');
-        }
+        // } catch (Exception $e) {
+        //     Log::error($e);
+        //     DB::rollBack();
+        //     // check quantity product
+        //     foreach(\Cart::getContent() as $product){
+        //         $productSize = ProductSize::where('id', $product->id)->first();
+        //         if($productSize->quantity < $product->quantity) {
+        //             \Cart::update(
+        //                 $product->id,
+        //                 [
+        //                     'quantity' => [
+        //                         'relative' => false,
+        //                         'value' => $productSize->quantity
+        //                     ],
+        //                 ]
+        //             );
+        //         }
+        //     }
+        //     return redirect()->route('cart.index')->with('error', 'Có lỗi xảy ra vui lòng kiểm tra lại');
+        // }
     }
 
     public function checkSignature(Request $request)
@@ -422,7 +429,8 @@ class CheckOutService
     {
         $ids = [];
         foreach(\Cart::getContent() as $product){
-            $productNew = Product::find($product->attributes->product_id);
+            $productNew = DB::table('products')->where('id', $product->attributes->product_id)->first();
+
             if ($productNew->updated_at != $product->attributes->updated_at) {
                 $ids[] = $product->id;
             }

@@ -195,6 +195,7 @@ class RegisterController extends Controller
                 'password' => $data['password'],
                 'phone_number' => $data['phone_number'],
                 'role_id' => Role::ROLE['user'],
+                'email_verified_at' => Carbon::now()
             ];
             
             // lấy thông tin địa chỉ từ phía khách hàng để thêm vào vào csdl
@@ -223,14 +224,12 @@ class RegisterController extends Controller
                     'expires_at' => Carbon::now()->addMinutes($time),
                 ]
             );
-            // gửi mail cho người dùng khác thực tài khoản
-            $user->notify(new VerifyUserRegister($token));
             //thêm địa của khách hàng vào trong csdl
             $addressData['user_id'] = $user->id;
             $this->addressRepository->updateOrCreate($addressData);
             DB::commit();
             // chuyển hướng người dùng đến trang thông báo xác thực tài khoản
-            return redirect()->route('user.verification.notice', $user->id);
+            return redirect()->route('user.login', $user->id)->with('success', "Đăng Ký Tài Khoản Thành Công");
         } catch (Exception $e) {
             // khi có lỗi xảy ra thì xóa bỏ dữ thêm vào database trước đó
             Log::error($e);

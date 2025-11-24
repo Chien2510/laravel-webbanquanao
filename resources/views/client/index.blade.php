@@ -21,60 +21,10 @@
       <div class="row ">
         <div class="col-sm-12 mtb_10">
           <!-- =====  PRODUCT TAB  ===== -->
+
           <div id="product-tab" class="mt_50">
             <div class="heading-part mb_10 ">
-              <h2 class="main_title">Sản Phẩm Bán Chạy</h2>
-            </div>
-            <div class="tab-content clearfix box">
-              <div class="tab-pane active" id="nArrivals">
-                <div class="nArrivals owl-carousel">
-                  @foreach ($bellingProducts as $bellingProduct)
-                    <div class="product-grid">
-                      <div class="item">
-                        <div class="product-thumb">
-                          <div class="image product-imageblock"> 
-                              <a href="{{ route('user.products_detail', $bellingProduct->id) }}"> 
-                                <img 
-                                  style="object-fit: contain;"
-                                  data-name="product_image" 
-                                  src="{{ asset("asset/client/images/products/small/$bellingProduct->img") }}" 
-                                  alt="iPod Classic"
-                                  title="iPod Classic" 
-                                  class="img-responsive product-thumb__img-product">
-                                <img 
-                                  style="object-fit: contain;"
-                                  src="{{ asset("asset/client/images/products/small//$bellingProduct->img") }}"
-                                  alt="iPod Classic" 
-                                  title="iPod Classic" 
-                                  class="img-responsive product-thumb__img-product"> 
-                              </a>
-                          </div>
-                          <div class="caption product-detail text-center">
-                            <div class="rating"> 
-                              <x-avg-stars :number="$bellingProduct->avg_rating" />
-                            </div>
-                            <h6 data-name="product_name" class="product-name">
-                              <a href="{{ route('user.products_detail', $bellingProduct->id) }}" title="Casual Shirt With Ruffle Hem">{{ $bellingProduct->name }}</a>
-                            </h6>
-                            <span class="price"><span class="amount"><span class="currencySymbol"></span>{{ format_number_to_money($bellingProduct->price_sell) }} VNĐ </span>
-                            </span>
-                          </div>
-                          <div class="button_group">
-                            <a href="{{ route('user.products_detail', $bellingProduct->id) }}" class="btn btn-primary" type="button">Xem Chi Tiết</a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  @endforeach
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- =====  PRODUCT TAB  END ===== -->
-          <!-- =====  PRODUCT TAB  ===== -->
-          <div id="product-tab" class="mt_50">
-            <div class="heading-part mb_10 ">
-              <h2 class="main_title">Sản Phẩm Mới Nhất</h2>
+              <h2 class="main_title">MẪU Mới Nhất</h2>
             </div>
             <div class="tab-content clearfix box">
               <div class="tab-pane active" id="nArrivals">
@@ -120,6 +70,59 @@
                     </div>
                     @endforeach
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          <!-- =====  PRODUCT TAB  END ===== -->
+          <!-- =====  PRODUCT TAB  ===== -->
+          <div id="product-tab" class="mt_50">
+            <div class="heading-part mb_10 ">
+              <h2 class="main_title">Sản Phẩm HOT TREND</h2>
+            </div>
+            <div class="tab-content clearfix box">
+              <div class="tab-pane active" id="nArrivals">
+                <div class="nArrivals owl-carousel">
+                  @foreach ($bellingProducts as $bellingProduct)
+                    <div class="product-grid">
+                      <div class="item">
+                        <div class="product-thumb">
+                          <div class="image product-imageblock"> 
+                              <a href="{{ route('user.products_detail', $bellingProduct->id) }}"> 
+                                <img 
+                                  style="object-fit: contain;"
+                                  data-name="product_image" 
+                                  src="{{ asset("asset/client/images/products/small/$bellingProduct->img") }}" 
+                                  alt="iPod Classic"
+                                  title="iPod Classic" 
+                                  class="img-responsive product-thumb__img-product">
+                                <img 
+                                  style="object-fit: contain;"
+                                  src="{{ asset("asset/client/images/products/small//$bellingProduct->img") }}"
+                                  alt="iPod Classic" 
+                                  title="iPod Classic" 
+                                  class="img-responsive product-thumb__img-product"> 
+                              </a>
+                          </div>
+                          <div class="caption product-detail text-center">
+                            <div class="rating"> 
+                              <x-avg-stars :number="$bellingProduct->avg_rating" />
+                            </div>
+                            <h6 data-name="product_name" class="product-name">
+                              <a href="{{ route('user.products_detail', $bellingProduct->id) }}" title="Casual Shirt With Ruffle Hem">{{ $bellingProduct->name }}</a>
+                            </h6>
+                            <span class="price"><span class="amount"><span class="currencySymbol"></span>{{ format_number_to_money($bellingProduct->price_sell) }} VNĐ </span>
+                            </span>
+                          </div>
+                          <div class="button_group">
+                            <a href="{{ route('user.products_detail', $bellingProduct->id) }}" class="btn btn-primary" type="button">Xem Chi Tiết</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  @endforeach
                 </div>
               </div>
             </div>

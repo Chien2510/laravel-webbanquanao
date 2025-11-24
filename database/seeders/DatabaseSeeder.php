@@ -233,7 +233,7 @@ class DatabaseSeeder extends Seeder
                 'data' => [
                     [
                         'id' => 1,
-                        'logo' => 'logo.png',
+                        'logo' => 'aa2.png',
                         'name' => 'FlatShop',
                         'email' => 'FlatShop@gmail.com',
                         'address' => '459 Tôn Đức Thắng, quận Liên Chiểu, thành phố Đà Nẵng',
@@ -242,7 +242,7 @@ class DatabaseSeeder extends Seeder
                         'notification' => '<b>WEBSITE tạm thời bảo trì để nâng cấp xin  quay lại sau</b>',
                         'introduction' => '
                             <h3 style="text-align: center; ">
-                            <b>GIỚI THIỆU VỀ TRUONG THUY SHOP</b>
+                            <b>GIỚI THIỆU VỀ CỬA HÀNG QUẦN ÁO</b>
                             </h3><h5><br></h5><h5><span style="font-family: " source="" sans="" pro";"="" times="" new="" roman"; "="">
                             Chào mừng đến với website bán thời trang của chúng tôi! 
                             Chúng tôi tự hào là một trong những cửa hàng trực tuyến hàng đầu về thời trang, 

@@ -10,8 +10,8 @@
   <meta content="" name="keywords">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <!-- Favicons -->
-  <link href="{{ asset('asset/admin/v1/assets/img/favicon.png') }}" rel="icon">
-  <link href="{{ asset('asset/admin/v1/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+  <link href="{{ asset('asset/admin/v1/assets/img/aa2.png') }}" rel="icon">
+  <link href="{{ asset('asset/admin/v1/assets/img/aa2.png') }}" rel="apple-touch-icon">
 
   <!-- Google Fonts -->
   <link href="https://fonts.gstatic.com" rel="preconnect">

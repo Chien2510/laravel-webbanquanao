@@ -1,4 +1,5 @@
 @extends('layouts.admin-auth')
+
 @section('content-auth')
 <main>
   <div class="container">
@@ -7,74 +8,74 @@
         <div class="row justify-content-center">
           <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
+            <!-- Logo -->
             <div class="d-flex justify-content-center py-4">
-              <a href="index.html" class="logo d-flex align-items-center w-auto">
-                <img src="{{ asset('asset/admin/v1/assets/img/logo.png') }}" alt="">
+              <a href="{{ url('/') }}" class="logo d-flex align-items-center w-auto">
+                <img src="{{ asset('asset/admin/v1/assets/img/aa2.png') }}" alt="">
                 <span class="d-none d-lg-block">Quản Trị WEBSITE</span>
               </a>
-            </div><!-- End Logo -->
+            </div>
 
-            <div class="card mb-3">
-
+            <div class="card mb-3 shadow-sm border-0 rounded-3">
               <div class="card-body">
-
-                <div class="pt-4 pb-2">
-                  <h5 class="card-title text-center pb-0 fs-4">ĐĂNG NHẬP HỆ THỐNG</h5>
-                  @if ($errors->get('disable_reason'))
-                    <p class="text-center small error invalid-feedback" style="display: block">{{ implode(", ",$errors->get('disable_reason')) }}</p>
-                  @endif
-                  @if ($errors->get('email'))
-                          {{-- <span id="email-error" class="error invalid-feedback" style="display: block">
-                            {{ implode(", ",$errors->get('email')) }}
-                          </span> --}}
-                          <p class="text-center small error invalid-feedback" style="display: block">{{ implode(", ",$errors->get('email')) }}</p>
-                        @endif
+                <div class="pt-4 pb-2 text-center">
+                  <h5 class="card-title pb-0 fs-4">ĐĂNG NHẬP HỆ THỐNG</h5>
                 </div>
-                
-                <form class="row g-3" action="{{ route('admin.login') }}" method="post" id="login-form__js">
+
+                {{-- Hiển thị lỗi từ session --}}
+                @if (session('error'))
+                  <div class="alert alert-danger text-center py-2">{{ session('error') }}</div>
+                @endif
+                @if (session('success'))
+                  <div class="alert alert-success text-center py-2">{{ session('success') }}</div>
+                @endif
+
+                {{-- Hiển thị lỗi validate --}}
+                @if ($errors->any())
+                  <div class="alert alert-danger small py-2 mb-2">
+                    <ul class="mb-0 ps-3">
+                      @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                      @endforeach
+                    </ul>
+                  </div>
+                @endif
+
+                {{-- Form đăng nhập --}}
+                <form class="row g-3" action="{{ route('admin.login') }}" method="POST" id="login-form__js">
                   @csrf
                   <div class="col-12">
-                    <label for="yourUsername" class="form-label">Email</label>
-                    <div class="input-group has-validation">
-                      <input type="text" name="email" value="{{ old('email') }}" class="form-control" id="email" required>
-                    </div>
+                    <label for="email" class="form-label">Email</label>
+                    <input type="text" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" id="email" required>
+                    @error('email')
+                      <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                   </div>
 
                   <div class="col-12">
-                    <label for="yourPassword" class="form-label">Mật Khẩu</label>
-                    <input type="password" name="password" class="form-control" id="yourPassword" required>
-                    <div class="invalid-feedback">
-                      @if ($errors->get('password'))
-                        <span id="password-error" class="error invalid-feedback" style="display: block">
-                          {{ implode(", ",$errors->get('password')) }}
-                        </span>
-                      @endif
-                    </div>
+                    <label for="yourPassword" class="form-label">Mật khẩu</label>
+                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" id="yourPassword" required>
+                    @error('password')
+                      <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
                   </div>
 
                   <div class="col-12">
                     <button class="btn btn-primary w-100" type="submit">Đăng Nhập</button>
                   </div>
-                 
                 </form>
-
               </div>
             </div>
 
-            <div class="credits">
-              <!-- All the links in the footer should remain intact. -->
-              <!-- You can delete the links only if you purchased the pro version. -->
-              <!-- Licensing information: https://bootstrapmade.com/license/ -->
-              <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
+            <div class="credits text-center mt-3">
+              <p class="small text-muted mb-0">© 2025 Quản trị website - Đăng nhập hệ thống</p>
             </div>
 
           </div>
         </div>
       </div>
-
     </section>
-
   </div>
-</main><!-- End #main -->
+</main>
 @vite(['resources/common/js/login.js'])
 @endsection

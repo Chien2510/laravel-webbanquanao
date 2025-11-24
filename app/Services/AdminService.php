@@ -337,6 +337,7 @@ class AdminService
                 'phone_number' => $data['phone_number'],
                 'role_id' => $data['role_id'],
                 'created_by' => Auth::guard('admin')->user()->id,
+                'email_verified_at' => Carbon::now(),
             ];
 
             // address data request
@@ -351,14 +352,6 @@ class AdminService
             $time = Config::get('auth.verification.expire.resend', 60);
             DB::beginTransaction();
             $user = $this->userRepository->create($userData);
-            UserVerify::updateOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'token' => $token,
-                    'expires_at' => Carbon::now()->addMinutes($time),
-                ]
-            );
-            $user->notify(new VerifyUser($token));
             $addressData['user_id'] = $user->id;
             $adminData['user_id'] = $user->id;
             $this->addressRepository->updateOrCreate($addressData);
@@ -629,24 +622,7 @@ class AdminService
             }
 
             DB::beginTransaction();
-            if ($userData['email'] !== $user->email) {
-                unset($userData['email']);
-                $this->userRepository->update($user, $userData);
-                $token = Str::random(64);
-                $time = Config::get('auth.verification.expire.resend', 60);
-                UserVerify::updateOrCreate(
-                    ['user_id' => $user->id],
-                    [
-                        'token' => $token,
-                        'expires_at' => Carbon::now()->addMinutes($time),
-                        'email_verify' => $request->email,
-                    ]
-                );
-                $user['email'] = $request->email;
-                $user->notify(new VerifyUser($token));
-            } else {
-                $this->userRepository->update($user, $userData);
-            }
+            $this->userRepository->update($user, $userData);
             DB::commit();
             return redirect()->route('admin.staffs_index')->with('success', TextSystemConst::UPDATE_SUCCESS);
         } catch (Exception $e) {
